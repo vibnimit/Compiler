@@ -14,6 +14,14 @@ then				{return THEN;}
 else    	        	return ELSE;
 print				return PRINT;
 for				return FOR;
+int				return INTEGER;
+char				return CHARACTER;
+float				return FLOAT;
+double				return DOUBLE;
+while				return WHILE;
+do				return DO;
+"{"				return OPENBR;
+"}"				return CLOSEBR;
 {ALPHA}({ALPHA}|{DIGIT})*    	return ID;
 {DIGIT}+             		{yylval.num=atoi(yytext); return NUM;}
 [ \t]                 		;

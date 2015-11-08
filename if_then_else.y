@@ -13,8 +13,10 @@ int ltop=0;
 
 %}
 
+//Remember variable no has to be removed later on;
+
 %union {char str[100]; int num;}
-%token ID IF THEN ELSE PRINT FOR LE EQ GE NE OR AND
+%token ID IF THEN ELSE PRINT FOR LE EQ GE NE OR AND INTEGER CHARACTER FLOAT DOUBLE WHILE DO OPENBR CLOSEBR
 %token <num> NUM
 %token <str> STRING
 %right '='
@@ -27,13 +29,29 @@ int ltop=0;
 
 S : 	IF '(' E ')'{lab1();} 
 	THEN P EL
-  |	PRINT EXP ';'	
+  |	PRINT EXP ';'
+  |	DATATYPE V PUNCT {printf("good\n");}	
   |	FOR'('E{lab4();}';'E{lab5();}';' E{lab6();}')'P{lab7();}
+  |	WHILE'(' {lab8();} E ')'{lab9();} P {lab10();}
+  |	DO {lab8();} E ';' WHILE '(' E ')' ';'{lab11();}
   ;
+
+PUNCT   : ','V PUNCT
+	| ';'
+	;
+
+DATATYPE : INTEGER|CHARACTER|FLOAT|DOUBLE
+   ;
+
 EL :	ELSE {lab2();}P{lab3();}
    |{lab3();}
    ;
-P  :  S | E';';
+
+P  : 	S P
+   | 	E';' P
+   |  	
+   ;
+
 E :V '='{push();} E{codegen_assign();}
   | E '+'{push();} E{codegen();}
   | E '-'{push();} E{codegen();}
@@ -166,3 +184,38 @@ lab7()
 	
 }
 
+lab8()
+{
+	no++;
+    printf("L%d: ",lnum);
+    label[++ltop]=lnum++;	
+}
+
+lab9()
+{
+ printf("if %s \ngoto L%d\n",st[top],lnum);
+ lnum++;
+printf("goto L%d\n",lnum);
+printf("L%d: ",lnum-1);
+ label[++ltop]=lnum;
+lnum++;
+no++;
+}
+
+lab10()
+{
+    int x;
+    x=label[ltop--];
+    printf("goto L%d \n",label[ltop--]);
+    printf("L%d: ",x);
+   
+}
+
+lab11()
+{
+ printf("if %s \ngoto L%d\n",st[top],label[ltop--]);
+printf("goto L%d\n",lnum);
+printf("L%d: ",lnum);
+ label[++ltop]=lnum;
+no++;
+}
