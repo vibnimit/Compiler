@@ -26,11 +26,11 @@ int ltop=0;
 %%
 
 S : 	IF '(' E ')'{lab1();} 
-	THEN P{lab2();} EL
+	THEN P EL
   |	PRINT EXP ';'	
   |	FOR'('E{lab4();}';'E{lab5();}';' E{lab6();}')'P{lab7();}
   ;
-EL :	ELSE P{lab3();}
+EL :	ELSE {lab2();}P{lab3();}
    |{lab3();}
    ;
 P  :  S | E';';
@@ -118,15 +118,13 @@ lnum++;
 no++;
 }
 
-lab2()
-{
+lab2(){
 int x;
 x=label[ltop--];
 printf("goto L%d\n",lnum);
 printf("L%d: ",x);
 label[++ltop]=lnum++;
 }
-
 lab3()
 {
 int y;
