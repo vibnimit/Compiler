@@ -26,14 +26,14 @@ int ltop=0;
 %%
 
 S : 	IF '(' E ')'{lab1();} 
-	THEN P{lab2();} 
-	ELSE P{lab3();}
-  |	IF '(' E ')'{lab1();} 
-	THEN P ';'{lab2();}
+	THEN P{lab2();} EL
   |	PRINT EXP ';'	
   |	FOR'('E{lab4();}';'E{lab5();}';' E{lab6();}')'P{lab7();}
   ;
-P  :  S | E ';';
+EL :	ELSE P{lab3();}
+   |{lab3();}
+   ;
+P  :  S | E';';
 E :V '='{push();} E{codegen_assign();}
   | E '+'{push();} E{codegen();}
   | E '-'{push();} E{codegen();}
@@ -124,17 +124,15 @@ int x;
 x=label[ltop--];
 printf("goto L%d\n",lnum);
 printf("L%d: ",x);
-label[++ltop]=lnum;
+label[++ltop]=lnum++;
 }
 
 lab3()
 {
 int y;
 y=label[ltop--];
-if(no>1)
-printf("L%d: L%d:\n",y,label[ltop]);
-else
 printf("L%d:\n",y);
+
 }
 lab4()
 {
@@ -145,11 +143,11 @@ lab4()
 lab5()
 {
     printf("if %s\ngoto L%d\n",st[top],lnum++);
-    printf("goto L%d\n",lnum);
     label[++ltop]=lnum;
-    label[++ltop]=lnum-1;
-    lnum++;
-    printf("L%d: ",lnum);
+    printf("goto L%d\n",lnum++);
+    label[++ltop]=lnum;
+    label[++ltop]=lnum-2;
+    printf("L%d: ",lnum++);
 }
 
 lab6()
@@ -165,10 +163,8 @@ lab7()
 {
     int x;
     x=label[ltop--];
-    printf("goto L%d \n",lnum);   
-	if(no>1)
-	printf("L%d: L%d:\n",x,label[ltop]);
-	else
-	printf("L%d:\n",x);
+    printf("goto L%d \n",x);   
+	printf("L%d:\n",label[ltop--]);
+	
 }
 
