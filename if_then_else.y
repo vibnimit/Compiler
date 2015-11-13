@@ -6,7 +6,7 @@ char st[100][10];
 int top=0;
 char i_[2]="0";
 char temp[2]="t";
-
+char sym_table[52];
 int label[20];
 int lnum=0,no=0;
 int ltop=0;
@@ -26,17 +26,21 @@ int ltop=0;
 %left '!' '*' '/' '%' 
 %left UMINUS
 %%
+START: 	S START
+	|
+  	;
 
 S : 	IF '(' E ')'{lab1();} 
-	THEN P EL
+	P EL
   |	PRINT EXP ';'
-  |	DATATYPE V PUNCT {printf("good\n");}	
+  |	DATATYPE V PUNCT {}	
   |	FOR'('E{lab4();}';'E{lab5();}';' E{lab6();}')'P{lab7();}
   |	WHILE'(' {lab8();} E ')'{lab9();} P {lab10();}
-  |	DO {lab8();} E ';' WHILE '(' E ')' ';'{lab11();}
+  |	DO {lab8();} P WHILE '(' E ')' ';'{lab11();}
+  |	E ';'
   ;
 
-PUNCT   : ','V PUNCT
+PUNCT   : ',' V PUNCT
 	| ';'
 	;
 
@@ -47,9 +51,12 @@ EL :	ELSE {lab2();}P{lab3();}
    |{lab3();}
    ;
 
-P  : 	S P
-   | 	E';' P
-   |  	
+P  : 	S
+   |	OPENBR S B CLOSEBR  	
+   ;
+
+B  :	P B
+   |
    ;
 
 E :V '='{push();} E{codegen_assign();}
